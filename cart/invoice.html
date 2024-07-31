@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<title>Invoice</title>
 		<link rel="license" href="https://www.opensource.org/licenses/mit-license/">
+		<link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.6.0/css/all.css">
 <style>
     /* reset */
 
@@ -209,6 +210,15 @@ tr:hover .cut { opacity: 1; }
 	span:empty { display: none; }
 	.add, .cut { display: none; }
 }
+.fa-xmark{
+	color: red;
+    font-size: 18px;
+    margin: 3px;
+    opacity: 1;
+    position: absolute;
+    top: 0;
+    left: 8em;
+}
 
 @page { margin: 0; }
 </style>
@@ -267,7 +277,7 @@ tr:hover .cut { opacity: 1; }
 			
 		</article>
 		<div class="box"><button class="button-3" role="button" onclick="senddata();">Proceed</button></div>
-		
+		<i class="fa-solid fa-xmark"></i>
 		<div class="container">
 			<h1>Scan QR Codes</h1>
 			<div class="sect">
@@ -278,19 +288,18 @@ tr:hover .cut { opacity: 1; }
            
             let table = document.querySelector("#table");
             
-            function row(i,Item,Description,Rate,quantity = 1,max_stock){
+            function row(i,Item,Description,Rate,quantity = 500,max_stock){
                 let a = `<td><a class="cut" onclick = "this.parentElement.parentElement.remove()">-</a><span contenteditable id="Item">${Item}</span></td>
 						<td><span contenteditable id="Description">${Description}</span></td>
-						<td><span data-prefix>$</span><span contenteditable id="Rate" oninput="let child = this.parentElement.parentElement.children[4].childNodes[1];child.innerHTML = Number(this.innerHTML)*Number(this.parentElement.parentElement.children[3].childNodes[0].innerHTML) ;price_update()">${Rate}</span></td>
-						<td><span contenteditable id="Quantity" oninput="calculate_val(this)" onload="calculate_val(this)" >${quantity}</span></td>
-						<td><span data-prefix>$</span><span id="Price" >`+Rate*quantity+`</span></td>`;
+						<td><span data-prefix>$</span><span contenteditable id="Rate" oninput="calculate_val(this)">${Rate}</span></td>
+						<td><span contenteditable id="Quantity" oninput="calculate_val(this)" onload="calculate_val(this)" >${(quantity>max_stock)?max_stock:quantity}</span></td>
+						<td><span data-prefix>$</span><span id="Price" >${Rate*((quantity>max_stock)?max_stock:quantity)}</span>${(max_stock==0)?'<i class="fa-solid fa-xmark" onclick = "this.parentElement.parentElement.remove()"></i>':''}</td>`;
                 let b = `<tr>${a}</tr>`;
                 table.innerHTML += (b);
 				price_update();
 				console.log("new object created");
 
 				calculate_val = function(e){
-					
 					let quantity = e.parentElement.parentElement.children[3].childNodes[0];
 					let rate = e.parentElement.parentElement.children[2].childNodes[1];
 					let price = e.parentElement.parentElement.children[4].childNodes[1];
@@ -299,6 +308,8 @@ tr:hover .cut { opacity: 1; }
 					price_update();
 					console.log(quantity,rate,price)
 				}
+
+
             }
             
             function price_update(){
@@ -398,7 +409,7 @@ function senddata() {
   xhttp.open("POST", "file.php", true);
   xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   xhttp.send(JSON.stringify(info_arr));
-  location.reload();
+  setTimeout(()=>location.reload(),5000);
 }
 
   
