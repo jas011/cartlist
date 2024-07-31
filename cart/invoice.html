@@ -282,12 +282,23 @@ tr:hover .cut { opacity: 1; }
                 let a = `<td><a class="cut" onclick = "this.parentElement.parentElement.remove()">-</a><span contenteditable id="Item">${Item}</span></td>
 						<td><span contenteditable id="Description">${Description}</span></td>
 						<td><span data-prefix>$</span><span contenteditable id="Rate" oninput="let child = this.parentElement.parentElement.children[4].childNodes[1];child.innerHTML = Number(this.innerHTML)*Number(this.parentElement.parentElement.children[3].childNodes[0].innerHTML) ;price_update()">${Rate}</span></td>
-						<td><span contenteditable id="Quantity" oninput="let child = this.parentElement.parentElement.children[4].childNodes[1];child.innerHTML = Number(this.innerHTML)*Number(this.parentElement.parentElement.children[2].childNodes[1].innerHTML) ;price_update();if(Number(this.innerHTML)>${max_stock}){this.innerHTML = ${max_stock};}" >${quantity}</span></td>
+						<td><span contenteditable id="Quantity" oninput="calculate_val(this)" onload="calculate_val(this)" >${quantity}</span></td>
 						<td><span data-prefix>$</span><span id="Price" >`+Rate*quantity+`</span></td>`;
                 let b = `<tr>${a}</tr>`;
                 table.innerHTML += (b);
 				price_update();
 				console.log("new object created");
+
+				calculate_val = function(e){
+					
+					let quantity = e.parentElement.parentElement.children[3].childNodes[0];
+					let rate = e.parentElement.parentElement.children[2].childNodes[1];
+					let price = e.parentElement.parentElement.children[4].childNodes[1];
+					if(Number(quantity.innerHTML)>max_stock){quantity.innerHTML = max_stock;}
+					price.innerHTML = quantity.innerHTML*rate.innerHTML;
+					price_update();
+					console.log(quantity,rate,price)
+				}
             }
             
             function price_update(){
@@ -330,7 +341,7 @@ tr:hover .cut { opacity: 1; }
 
 	function onScanSuccess(decodedText, decodedResult) {
 	json = JSON.parse(`${decodedText}`);
-	filter();
+	let stock = fetch("stock.php?key="+json.model).then(response =>  response.json()).then(data => filter(data));
 	audio.play();
 		scanner.clear();  // Stop the scanner after successful scan
 	}
@@ -339,6 +350,8 @@ tr:hover .cut { opacity: 1; }
         }
 
 function filter(data=1){
+	if(data>0)data = 1;
+	else data = 0;
 try{
 json.count = Number(data);
 }
@@ -385,6 +398,7 @@ function senddata() {
   xhttp.open("POST", "file.php", true);
   xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   xhttp.send(JSON.stringify(info_arr));
+  location.reload();
 }
 
   
