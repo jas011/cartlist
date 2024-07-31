@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Invoice</title>
-		<link rel="stylesheet" href="style.css">
 		<link rel="license" href="https://www.opensource.org/licenses/mit-license/">
 <style>
     /* reset */
@@ -24,6 +23,63 @@
 	text-decoration: none;
 	vertical-align: top;
 }
+.box {
+    display: flex;
+    justify-content: flex-end;
+    margin: -42px 0 0 0;
+}
+
+/* CSS */
+.button-3 {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.button-3:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
+.button-3:hover {
+  background-color: #2c974b;
+}
+
+.button-3:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.button-3:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.button-3:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
 
 /* content editable */
 
@@ -34,6 +90,9 @@
 
 span[contenteditable] { display: inline-block; }
 
+#my-qr-reader{
+            width:500px;
+        }
 /* heading */
 
 h1 { font: bold 100% sans-serif; letter-spacing: 0.5em; text-align: center; text-transform: uppercase; }
@@ -158,9 +217,9 @@ tr:hover .cut { opacity: 1; }
 		<header>
 			<h1>Invoice</h1>
 			<address contenteditable>
-				<p>Jonathan Neal</p>
-				<p>101 E. Chapman Ave<br>Orange, CA 92866</p>
-				<p>(800) 555-1234</p>
+				<p>Jaskirat Singh</p>
+				<p>B.R.S. Nagar, Ludhiana<br>punjab 141012</p>
+				<p>(+91) 98554-28591</p>
 			</address>
 			<span><img alt="" src=https://i.pinimg.com/736x/13/8d/55/138d55e0b9ebbc40fa24bc2846175ffc.jpg"><input type="file" accept="image/*"></span>
 		</header>
@@ -180,7 +239,7 @@ tr:hover .cut { opacity: 1; }
 				</tr>
 				<tr>
 					<th><span contenteditable>Amount Due</span></th>
-					<td><span id="due" contenteditable>$</span><span>600.00</span></td>
+					<td><span id="due" >$</span><span contenteditable>0</span></td>
 				</tr>
 			</table>
 			<table class="inventory">
@@ -194,46 +253,53 @@ tr:hover .cut { opacity: 1; }
 					</tr>
 				</thead>
 				<tbody id="table">
-                    
-
-					<tr>
-						<td><a class="cut">-</a><span contenteditable id="Item">Front End Consultation</span></td>
-						<td><span contenteditable id="Description">Experience Review</span></td>
-						<td><span data-prefix>$</span><span contenteditable id="Rate">150.00</span></td>
-						<td><span contenteditable id="Quantity">4</span></td>
-						<td><span data-prefix>$</span><span id="Price">600.00</span></td>
-					</tr>
 
                     
 				</tbody>
 			</table>
-			<a class="add" onclick="row(0,'er','dc',150,1,5)">+</a>
+			<a class="add" onclick="row(0,'','',0,0,0)">+</a>
 			<table class="balance">
 				<tr>
 					<th><span contenteditable>Total</span></th>
-					<td><span data-prefix>$</span><span id="total">600.00</span></td>
+					<td><span data-prefix>$</span><span id="total">0</span></td>
 				</tr>
-				
 			</table>
+			
 		</article>
-		<aside>
-			<h1><span contenteditable>Additional Notes</span></h1>
-			<div contenteditable>
-				<p>A finance charge of 1.5% will be made on unpaid balances after 30 days.</p>
+		<div class="box"><button class="button-3" role="button" onclick="senddata();">Proceed</button></div>
+		
+		<div class="container">
+			<h1>Scan QR Codes</h1>
+			<div class="sect">
+				<div id="my-qr-reader"></div>
 			</div>
-		</aside>
+		</div>
         <script>
            
             let table = document.querySelector("#table");
             
-            function row(i,Item,Description,Rate,quantity,max_stock){
+            function row(i,Item,Description,Rate,quantity = 1){
                 let a = `<td><a class="cut" onclick = "this.parentElement.parentElement.remove()">-</a><span contenteditable id="Item">${Item}</span></td>
 						<td><span contenteditable id="Description">${Description}</span></td>
-						<td><span data-prefix>$</span><span id="Rate">${Rate}.00</span></td>
-						<td><span contenteditable id="Quantity" oninput="let child = this.parentElement.parentElement.children[4].childNodes[1];child.innerHTML = Number(this.innerHTML)*${Rate} ;price_update()">${quantity}</span></td>
+						<td><span data-prefix>$</span><span contenteditable id="Rate" oninput="let child = this.parentElement.parentElement.children[4].childNodes[1];child.innerHTML = Number(this.innerHTML)*Number(this.parentElement.parentElement.children[3].childNodes[0].innerHTML) ;price_update()">${Rate}</span></td>
+						<td><span contenteditable id="Quantity" oninput="calculate_val(this)" onload="calculate_val(this)" >${quantity}</span></td>
 						<td><span data-prefix>$</span><span id="Price" >`+Rate*quantity+`</span></td>`;
                 let b = `<tr>${a}</tr>`;
                 table.innerHTML += (b);
+				price_update();
+				console.log("new object created");
+
+				calculate_val = function(e){
+					let max_stock = 0;
+					let stock = fetch("stock.php?key="+e.model).then(response =>  response.json()).then(data => max_stock);
+					let quantity = e.parentElement.parentElement.children[3].childNodes[0];
+					let rate = e.parentElement.parentElement.children[2].childNodes[1];
+					let price = e.parentElement.parentElement.children[4].childNodes[1];
+					if(Number(quantity.innerHTML)>max_stock){quantity.innerHTML = max_stock;}
+					price.innerHTML = quantity.innerHTML*rate.innerHTML;
+					price_update();
+					console.log(quantity,rate,price)
+				}
             }
             
             function price_update(){
@@ -244,8 +310,95 @@ tr:hover .cut { opacity: 1; }
                     sum += Number(p[index].innerHTML)
                 }
                 total.innerHTML = sum;
+				getinfo();
             }
-            let ab = new row(0,'er','dc',150,4,5);
         </script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+	let scanner;
+	let laps = [];
+	var audio = new Audio('https://www.soundjay.com/buttons/sounds/beep-08b.mp3');
+	
+    const info_arr = new Object();
+
+	window.onkeyup = function(event) {    
+		  let key = event.key.toUpperCase();
+		  if ( key == 'A' ) {
+			startScanner();
+} 
+          else if ( key == 'P' ) {
+			console.log(info_arr);
+} 
+}
+	function startScanner() {
+		if (!scanner) {
+			scanner = new Html5QrcodeScanner("my-qr-reader", { fps: 60, qrbox: 250 });
+			scanner.render(onScanSuccess, onScanFailure);
+		} else {
+			scanner.clear();
+			scanner.render(onScanSuccess);
+		}
+	}
+
+	function onScanSuccess(decodedText, decodedResult) {
+	json = JSON.parse(`${decodedText}`);
+	filter();
+	audio.play();
+		scanner.clear();  // Stop the scanner after successful scan
+	}
+	function onScanFailure(error) {
+            // handle scan failure, if needed
+        }
+
+function filter(data=1){
+try{
+json.count = Number(data);
+}
+catch(err) {
+json.count+=0;
+}
+
+let filtered_list = new Set(laps.map(i=>i.model));// here we are identifing a object using model attribute and trying to update the count
+if(filtered_list.has(json.model) && laps.length>0){
+for(let i = 0;i<laps.length ; i++){
+	if (json.model == laps[i].model){
+		laps[i].count+=Number(json.count);
+		break;
+	}
+
+}
+}
+else{laps.push(json);}
+console.log(laps);
+table.innerHTML = "";
+for (let index = 0; index < laps.length; index++) {
+	
+	let e = laps[index];
+	row(index,e.brand ,e.model ,100,e.count)
+}
+
+}
+
+async function getinfo(){
+    let dis =  document.querySelectorAll("#Description"),
+    quantity = document.querySelectorAll("#Quantity");
+    for (let index = 0; index < dis.length; index++) {
+		let stock = await fetch("stock.php?key="+dis[index].innerHTML).then(response => {return response.text()}).then(data => {return(data);});
+        info_arr[dis[index].innerHTML] = stock-quantity[index].innerHTML;
+    }
+    
+}
+
+
+function senddata() {
+	getinfo();
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "file.php", true);
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhttp.send(JSON.stringify(info_arr));
+}
+
+  
+</script>
 	</body>
 </html>
