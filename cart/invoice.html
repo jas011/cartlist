@@ -278,28 +278,16 @@ tr:hover .cut { opacity: 1; }
            
             let table = document.querySelector("#table");
             
-            function row(i,Item,Description,Rate,quantity = 1){
+            function row(i,Item,Description,Rate,quantity = 1,max_stock){
                 let a = `<td><a class="cut" onclick = "this.parentElement.parentElement.remove()">-</a><span contenteditable id="Item">${Item}</span></td>
 						<td><span contenteditable id="Description">${Description}</span></td>
 						<td><span data-prefix>$</span><span contenteditable id="Rate" oninput="let child = this.parentElement.parentElement.children[4].childNodes[1];child.innerHTML = Number(this.innerHTML)*Number(this.parentElement.parentElement.children[3].childNodes[0].innerHTML) ;price_update()">${Rate}</span></td>
-						<td><span contenteditable id="Quantity" oninput="calculate_val(this)" onload="calculate_val(this)" >${quantity}</span></td>
+						<td><span contenteditable id="Quantity" oninput="let child = this.parentElement.parentElement.children[4].childNodes[1];child.innerHTML = Number(this.innerHTML)*Number(this.parentElement.parentElement.children[2].childNodes[1].innerHTML) ;price_update();if(Number(this.innerHTML)>${max_stock}){this.innerHTML = ${max_stock};}" >${quantity}</span></td>
 						<td><span data-prefix>$</span><span id="Price" >`+Rate*quantity+`</span></td>`;
                 let b = `<tr>${a}</tr>`;
                 table.innerHTML += (b);
 				price_update();
 				console.log("new object created");
-
-				calculate_val = function(e){
-					let max_stock = 0;
-					let stock = fetch("stock.php?key="+e.model).then(response =>  response.json()).then(data => max_stock);
-					let quantity = e.parentElement.parentElement.children[3].childNodes[0];
-					let rate = e.parentElement.parentElement.children[2].childNodes[1];
-					let price = e.parentElement.parentElement.children[4].childNodes[1];
-					if(Number(quantity.innerHTML)>max_stock){quantity.innerHTML = max_stock;}
-					price.innerHTML = quantity.innerHTML*rate.innerHTML;
-					price_update();
-					console.log(quantity,rate,price)
-				}
             }
             
             function price_update(){
@@ -374,7 +362,8 @@ table.innerHTML = "";
 for (let index = 0; index < laps.length; index++) {
 	
 	let e = laps[index];
-	row(index,e.brand ,e.model ,100,e.count)
+	let stock = fetch("stock.php?key="+e.model).then(response =>  response.json()).then(data => row(index,e.brand ,e.model ,100,e.count,data));
+	
 }
 
 }
